@@ -2,7 +2,7 @@
 
 <p align="center">
   Find your keepers. Clear out the rest.<br>
-  A photo culling app that runs entirely on your Mac.
+  A photo cleanup app that runs entirely on your Mac.
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 Declic goes through a whole memory card, groups the bursts, picks the sharpest frame and tells you why. It's pronounced *day-kleek*, French for the click of a shutter.
 
-Built for photographers who shoot fast: sports, events, wildlife. When the moment lasts a fraction of a second you shoot in bursts, and one weekend fills a card with thousands of frames that look almost the same. Declic does the first pass and shows you why it picked each frame. You make the final call.
+Copies from three imports ago. Ten versions of the same sunset. Bursts where only one frame is sharp. A drive that keeps filling up. Declic sorts through all of it on your Mac: it finds the copies and near-copies, picks the best shot of every moment, flags the blurry ones and tells you how much space you'd get back. You decide what goes.
 
 On one race weekend: 3,622 RAW files, 367 bursts, and 65 GB of the 91 GB turned out to be near-identical frames.
 
@@ -61,7 +61,7 @@ Early. It works well on my photos, which isn't the same as working well on yours
 
 ## Join the beta
 
-I'm looking for a small group of photographers who shoot a lot of bursts: sports, events, wildlife, kids. You'd get early builds, and I'd get to see where it gets things wrong.
+Anyone with a drive full of photos is welcome: pros, hobbyists, parents, travelers. You'd get early builds, and I'd get to see where it gets things wrong.
 
 **[Sign up here](../../issues/new?template=beta-signup.yml).** It opens a short form. Issues on GitHub are public, so don't put your email or phone number in it. I'll reply on the issue.
 
