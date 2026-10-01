@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy · Declic</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+  :root { color-scheme: light; --page: #faf8f4; --ink: #1c1a17; --ink-2: #57524a; --line: #e6e1d8; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--page); color: var(--ink); }
+  @media (prefers-color-scheme: dark) { :root { color-scheme: dark; --page: #141311; --ink: #f3efe7; --ink-2: #c4bdb0; --line: #34312b; } }
+  body { margin: 0; background: var(--page); line-height: 1.65; }
+  main { max-width: 680px; margin: 0 auto; padding: 48px 24px 72px; }
+  a { color: inherit; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 750; font-size: 18px; text-decoration: none; margin-bottom: 40px; }
+  .brand img { width: 28px; height: 28px; }
+  h1 { font-size: 40px; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 12px; }
+  h2 { font-size: 20px; margin: 36px 0 8px; }
+  p, li { color: var(--ink-2); }
+  ul { padding-left: 20px; }
+  li + li { margin-top: 6px; }
+  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="./"><img src="assets/logo.svg" alt="">declic</a>
+  <h1>Privacy</h1>
+  <p>Short version: your photos stay on your Mac.</p>
+
+  <h2>The app</h2>
+  <ul>
+    <li>Every model runs on your computer. Nothing is sent to a server for analysis, ever.</li>
+    <li>There's no account to create.</li>
+    <li>There's no analytics, telemetry or crash reporting that phones home.</li>
+    <li>The only time Declic uses the internet is the first setup, when it downloads the models (about 5.5 GB). After that you can turn the Wi-Fi off and it keeps working.</li>
+    <li>What it learns about your photos (scores, faces, captions, previews) is stored in a local database and folder on your Mac. Delete them and it's gone.</li>
+    <li>It never deletes your photos. When you approve rejects, they're moved into a staging folder on the same drive, and every move can be undone.</li>
+  </ul>
+
+  <h2>Faces</h2>
+  <p>Declic groups faces so you can find photos of the same person. That data stays on your Mac like everything else, and it's never used for anything other than showing you your own photos.</p>
+
+  <h2>This website</h2>
+  <p>This is a static page hosted on GitHub Pages. It doesn't load any scripts, fonts or trackers from other companies. GitHub itself may keep standard server logs, as it does for every Pages site; see <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>.</p>
+
+  <h2>The beta sign-up</h2>
+  <p>The sign-up form is a GitHub issue, which means it's public. Don't put your email, phone number or anything else private in it. I'll reply on the issue.</p>
+
+  <footer><a href="./">Back to Declic</a></footer>
+</main>
+</body>
+</html>

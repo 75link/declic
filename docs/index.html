@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Declic: find your keepers, clear out the rest</title>
+<meta name="description" content="Declic goes through a whole memory card on your Mac, groups the bursts, picks the sharpest frame and tells you why. Nothing leaves your computer.">
+<meta property="og:title" content="Declic">
+<meta property="og:description" content="Find your keepers. Clear out the rest. A photo culling app that runs entirely on your Mac.">
+<meta property="og:image" content="assets/preview.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+  /* System fonts on purpose: no font CDN means no third party sees who visits. */
+  :root {
+    color-scheme: light;
+    --page: #faf8f4;
+    --surface: #ffffff;
+    --surface-2: #f3f0ea;
+    --line: #e6e1d8;
+    --ink: #1c1a17;
+    --ink-2: #57524a;
+    --ink-3: #8a8378;
+    --amber: #b5801f;
+    --amber-soft: #fbf1dd;
+    --good: #1f7a3d;
+    --good-soft: #e5f3e9;
+    --bad: #b3372b;
+    --bad-soft: #fbe8e5;
+    --radius: 16px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--ink);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #141311;
+      --surface: #1c1b18;
+      --surface-2: #24221e;
+      --line: #34312b;
+      --ink: #f3efe7;
+      --ink-2: #c4bdb0;
+      --ink-3: #8f887c;
+      --amber: #e2b04f;
+      --amber-soft: #2c2415;
+      --good: #4fbf74;
+      --good-soft: #17281c;
+      --bad: #ef7d6f;
+      --bad-soft: #2e1a17;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); line-height: 1.6; }
+  img, svg { max-width: 100%; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 24px; }
+
+  header.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--page) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 750; font-size: 19px; letter-spacing: -0.01em; }
+  .brand img { width: 30px; height: 30px; }
+  nav { display: flex; gap: 22px; align-items: center; font-size: 15px; }
+  nav a { text-decoration: none; color: var(--ink-2); }
+  nav a:hover { color: var(--ink); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 10px; font-weight: 650; text-decoration: none; font-size: 15px; }
+  .btn.primary { background: var(--ink); color: var(--page); }
+  .btn.ghost { box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); background: var(--surface); }
+  .btn:hover { filter: brightness(1.12); }
+  nav .btn { padding: 8px 14px; color: var(--page); }
+
+  .hero { padding: 72px 0 40px; }
+  .hero h1 { font-size: clamp(40px, 6.4vw, 68px); line-height: 1.02; letter-spacing: -0.035em; margin: 0 0 20px; max-width: 13ch; }
+  .hero p.lead { font-size: 20px; color: var(--ink-2); max-width: 54ch; margin: 0 0 28px; }
+  .hero .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero small { display: block; margin-top: 14px; color: var(--ink-3); font-size: 14px; }
+  .say { font-family: ui-serif, Georgia, serif; font-style: italic; color: var(--amber); font-weight: 500; }
+
+  /* The illustrated burst */
+  .burst { margin-top: 48px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 22px; box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 18px 40px rgba(40,30,10,.07); }
+  .burst-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; margin-bottom: 16px; font-size: 14px; color: var(--ink-3); }
+  .burst-head strong { color: var(--ink); font-size: 15px; }
+  .frames { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .frame { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--surface-2); display: grid; align-content: start; }
+  .frame.best { border-color: var(--good); box-shadow: 0 0 0 1px var(--good); }
+  .frame.reject { opacity: .58; }
+  .frame svg { display: block; width: 100%; height: auto; }
+  .frame .meta { padding: 10px 11px 12px; display: grid; gap: 6px; }
+  .frame .meta b { font-size: 13px; }
+  .tag { justify-self: start; font-size: 12px; font-weight: 650; padding: 2px 10px; border-radius: 999px; }
+  .tag.keep { background: var(--good-soft); color: var(--good); }
+  .tag.reject { background: var(--bad-soft); color: var(--bad); }
+  .frame .meta span:last-child { font-size: 12px; color: var(--ink-3); line-height: 1.4; }
+
+  section { padding: 72px 0; }
+  section + section { border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(28px, 3.6vw, 40px); letter-spacing: -0.025em; line-height: 1.1; margin: 0 0 16px; max-width: 22ch; }
+  .intro { font-size: 18px; color: var(--ink-2); max-width: 62ch; margin: 0 0 36px; }
+
+  .story { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: start; }
+  .story p { color: var(--ink-2); font-size: 17px; margin: 0 0 16px; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
+  .stat b { display: block; font-size: 34px; letter-spacing: -0.02em; line-height: 1.1; }
+  .stat span { color: var(--ink-3); font-size: 14px; }
+  .stat.accent { background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 35%, var(--line)); }
+
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .card h3 { margin: 0 0 8px; font-size: 17px; letter-spacing: -0.01em; }
+  .card p { margin: 0; color: var(--ink-2); font-size: 15px; }
+
+  .technique { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .technique .card { padding: 0; overflow: hidden; }
+  .technique .card div { padding: 18px 20px 20px; }
+  .technique svg { display: block; width: 100%; height: auto; background: var(--surface-2); }
+
+  .privacy { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .privacy ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+  .privacy li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--ink-2); }
+  .privacy li::before { content: "✓"; color: var(--good); font-weight: 800; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--ink-3); font-weight: 600; font-size: 13px; }
+  tr:last-child td { border-bottom: 0; }
+  .table-wrap { overflow-x: auto; }
+
+  .status { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .status .card ul { margin: 10px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 15px; display: grid; gap: 6px; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; }
+  .pill.now { background: var(--good-soft); color: var(--good); }
+  .pill.next { background: var(--amber-soft); color: var(--amber); }
+
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; }
+  details + details { margin-top: 10px; }
+  summary { cursor: pointer; font-weight: 650; }
+  details p { color: var(--ink-2); margin: 10px 0 0; }
+
+  .cta { text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 56px 24px; }
+  .cta h2 { margin-inline: auto; }
+  .cta p { color: var(--ink-2); max-width: 52ch; margin: 0 auto 26px; font-size: 17px; }
+
+  footer { padding: 36px 0 48px; color: var(--ink-3); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    .frames { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .frames .frame:nth-child(n+4) { display: none; }
+    .story, .privacy, .status { grid-template-columns: 1fr; }
+    .grid, .technique { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 620px) {
+    nav a:not(.btn) { display: none; }
+    .frames { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .frames .frame:nth-child(n+3) { display: none; }
+    .grid, .technique, .stats { grid-template-columns: 1fr; }
+    .hero { padding-top: 48px; }
+    section { padding: 56px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- One drawing reused for every frame: a rider on a road. Frames differ only in blur. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="soft1"><feGaussianBlur stdDeviation="1.4"/></filter>
+    <filter id="soft2"><feGaussianBlur stdDeviation="2.6"/></filter>
+    <filter id="soft3"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="streak"><feGaussianBlur stdDeviation="9 0.4"/></filter>
+    <filter id="bokeh"><feGaussianBlur stdDeviation="5"/></filter>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6d9a2"/><stop offset="1" stop-color="#e9b770"/>
+    </linearGradient>
+    <g id="scenery">
+      <rect width="240" height="160" fill="url(#sky)"/>
+      <g fill="#c98f4c" opacity=".55">
+        <rect x="8" y="58" width="18" height="52" rx="3"/><rect x="40" y="44" width="14" height="66" rx="3"/>
+        <rect x="150" y="50" width="20" height="60" rx="3"/><rect x="196" y="40" width="16" height="70" rx="3"/>
+        <circle cx="96" cy="62" r="20"/><circle cx="226" cy="70" r="16"/>
+      </g>
+      <rect y="110" width="240" height="50" fill="#7a6a58"/>
+      <rect y="126" width="240" height="3" fill="#efe3cf" opacity=".7"/>
+    </g>
+    <g id="rider" fill="none" stroke="#2a2420" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="96" cy="112" r="16"/><circle cx="148" cy="112" r="16"/>
+      <path d="M96 112l20-28h24l8 28M116 84l14 28h-34M140 84l-4-8h10"/>
+      <path d="M124 82l6-22M130 60l14 8" stroke-width="7"/>
+      <circle cx="128" cy="48" r="8" fill="#2a2420" stroke="none"/>
+      <path d="M121 44c4-6 13-6 17 0" stroke="#d64b2f" stroke-width="5"/>
+    </g>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="assets/logo.svg" alt="">declic</a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#technique">Technique</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#status">Status</a>
+      <a class="btn primary" data-link="beta" href="#join">Join the beta</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <h1>Find your keepers. Clear out the rest.</h1>
+    <p class="lead">
+      Declic goes through a whole memory card on your Mac, groups the bursts, picks the sharpest frame and tells you why it picked it.
+      Your photos never leave your computer. Not for analysis, not for anything.
+    </p>
+    <div class="actions">
+      <a class="btn primary" data-link="beta" href="#join">Join the beta</a>
+      <a class="btn ghost" href="#how">See how it decides</a>
+    </div>
+    <small>Free during the beta. Mac with Apple Silicon. Declic is pronounced <span class="say">day-kleek</span>, French for the click of a shutter.</small>
+
+    <div class="burst" aria-label="Example of a burst reviewed by Declic">
+      <div class="burst-head">
+        <strong>Burst · 5 frames · 0.6 s · 1/60 s <span style="font-weight:400;color:var(--ink-3)">(illustration)</span></strong>
+        <span>Ranked best to worst. You approve, Declic does the rest.</span>
+      </div>
+      <div class="frames">
+        <figure class="frame best" style="margin:0">
+          <svg viewBox="0 0 240 160" role="img" aria-label="Sharp rider, streaked background"><use href="#scenery" filter="url(#streak)"/><use href="#rider"/></svg>
+          <figcaption class="meta"><b>#1 · DSC07015.ARW</b><span class="tag keep">Best frame</span><span>Sharpest subject. Panning at 1/60 s: rider sharp, background blurred on purpose.</span></figcaption>
+        </figure>
+        <figure class="frame" style="margin:0">
+          <svg viewBox="0 0 240 160" role="img" aria-label="Slightly soft rider"><use href="#scenery" filter="url(#streak)"/><use href="#rider" filter="url(#soft1)"/></svg>
+          <figcaption class="meta"><b>#2 · DSC07016.ARW</b><span class="tag keep">Alternate</span><span>Nearly as good. Softer subject focus (79 vs 84).</span></figcaption>
+        </figure>
+        <figure class="frame reject" style="margin:0">
+          <svg viewBox="0 0 240 160" role="img" aria-label="Soft rider"><use href="#scenery" filter="url(#streak)"/><use href="#rider" filter="url(#soft2)"/></svg>
+          <figcaption class="meta"><b>#3 · DSC07014.ARW</b><span class="tag reject">Reject</span><span>Softer subject focus (66 vs 84).</span></figcaption>
+        </figure>
+        <figure class="frame reject" style="margin:0">
+          <svg viewBox="0 0 240 160" role="img" aria-label="Blurry rider"><use href="#scenery" filter="url(#streak)"/><use href="#rider" filter="url(#soft3)"/></svg>
+          <figcaption class="meta"><b>#4 · DSC07017.ARW</b><span class="tag reject">Reject</span><span>Softer subject focus (58 vs 84).</span></figcaption>
+        </figure>
+        <figure class="frame reject" style="margin:0">
+          <svg viewBox="0 0 240 160" role="img" aria-label="Everything blurred"><use href="#scenery" filter="url(#soft3)"/><use href="#rider" filter="url(#soft3)"/></svg>
+          <figcaption class="meta"><b>#5 · DSC07013.ARW</b><span class="tag reject">Reject</span><span>Camera shake, rider and road both soft.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+
+  <section id="story">
+    <div class="wrap story">
+      <div>
+        <h2>Why I built it</h2>
+        <p>I came home from a two-day cycling race with one memory card and 3,622 RAW files on it. Most of them were bursts: ten, twenty, sometimes forty frames of the same rider going past.</p>
+        <p>Going through that by hand takes an evening, and I always end up keeping too much because I'm scared of deleting the one good frame. So I started building something that does the first pass for me, on my own laptop, without uploading anything.</p>
+        <p>That turned into Declic.</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>3,622</b><span>RAW files on the card</span></div>
+        <div class="stat"><b>367</b><span>bursts found</span></div>
+        <div class="stat accent"><b>65 GB</b><span>of 85 GB was frames I didn't need</span></div>
+        <div class="stat"><b>0</b><span>photos uploaded anywhere</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <h2>What it actually does</h2>
+      <p class="intro">Point it at a folder or plug in your card. It reads everything and stores what it learns in a local database. Your originals stay untouched unless you tell it to move something.</p>
+      <div class="grid">
+        <div class="card"><h3>Groups your bursts</h3><p>Frames shot seconds apart that show the same moment end up together, ranked from best to worst. Each one comes with a short reason, so you can disagree with it.</p></div>
+        <div class="card"><h3>Judges focus on the subject</h3><p>It finds the rider, the runner, the bird, and checks how sharp they are. A busy sharp background won't win over a sharp face.</p></div>
+        <div class="card"><h3>Catches duplicates</h3><p>Exact copies, the JPEG you exported last year next to its RAW, three versions of the same edit. The original is kept as the master.</p></div>
+        <div class="card"><h3>Knows who's in the photo</h3><p>Faces are grouped into people. Give someone a name once and you can pull up every photo of them.</p></div>
+        <div class="card"><h3>Search by describing</h3><p>Type "crowd cheering at the finish" or "bike close-up" and it finds them. No tagging by hand.</p></div>
+        <div class="card"><h3>Shows the space you'd get back</h3><p>The dashboard tells you how much of your card is weaker frames and duplicates before you touch anything.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="technique">
+    <div class="wrap">
+      <h2>It doesn't punish good technique</h2>
+      <p class="intro">Most "blur detectors" look at the whole picture. That's how a culling tool ends up throwing away your best panning shot. Declic measures the subject separately, checks your shutter speed, and looks at which way the blur goes.</p>
+      <div class="technique">
+        <div class="card">
+          <svg viewBox="0 0 240 160" role="img" aria-label="Panning: sharp rider, streaked background"><use href="#scenery" filter="url(#streak)"/><use href="#rider"/></svg>
+          <div><h3>Panning</h3><p>Motion blur streaks in one direction. Lens blur doesn't. On my test card, fast-shutter backgrounds scored around 1.2 on that measure and 1/60 s pans went up to 12, so it can tell them apart.</p></div>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 240 160" role="img" aria-label="Shallow depth of field: sharp rider, soft background"><use href="#scenery" filter="url(#bokeh)"/><use href="#rider"/></svg>
+          <div><h3>Shallow depth of field</h3><p>A soft background at f/2.8 is a choice, not a mistake. Focus is scored on the person, never on what's behind them.</p></div>
+        </div>
+        <div class="card">
+          <svg viewBox="0 0 240 160" role="img" aria-label="Silhouette against a bright sky"><rect width="240" height="160" fill="url(#sky)"/><rect y="110" width="240" height="50" fill="#2a2420"/><use href="#rider" style="color:#000"/></svg>
+          <div><h3>Silhouettes and low-key light</h3><p>Dark on purpose isn't underexposed. A local vision model looks at the photo with your camera settings and flags deliberate choices so they don't get marked down.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap privacy">
+      <div>
+        <h2>Your photos stay on your Mac</h2>
+        <p class="intro" style="margin-bottom:24px">Every model runs locally on Apple Silicon. After the one-time model download, Declic works with the Wi-Fi off.</p>
+        <ul>
+          <li>No account, no cloud, no upload.</li>
+          <li>No analytics or tracking in the app. This page doesn't load any third-party scripts or fonts either.</li>
+          <li>It never deletes anything. Rejects you approve get moved to a staging folder on the same drive, and one click puts them all back.</li>
+          <li>RAW files are read, never written to.</li>
+        </ul>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>What it does</th><th>Model</th><th>License</th></tr></thead>
+          <tbody>
+            <tr><td>Search and similarity</td><td>Google SigLIP</td><td>Apache-2.0</td></tr>
+            <tr><td>Aesthetic score</td><td>LAION predictor on OpenAI CLIP ViT-L/14</td><td>Apache-2.0 / MIT</td></tr>
+            <tr><td>Faces and people</td><td>OpenCV YuNet + SFace</td><td>MIT / Apache-2.0</td></tr>
+            <tr><td>Finding the subject</td><td>RF-DETR Large</td><td>Apache-2.0</td></tr>
+            <tr><td>Captions and technique</td><td>Qwen3-VL 4B, run with MLX</td><td>Apache-2.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="status">
+    <div class="wrap">
+      <h2>Where it's at</h2>
+      <p class="intro">Declic is early. It works well on my own photos, which isn't the same as working well on yours. Here's the honest list.</p>
+      <div class="status">
+        <div class="card">
+          <span class="pill now">Works today</span>
+          <ul>
+            <li>Sony ARW, plus JPEG, HEIC and TIFF. Canon, Nikon, Fuji and DNG go through the same macOS decoder but haven't been tested yet.</li>
+            <li>Burst grouping with ranked frames and reasons</li>
+            <li>Subject focus, panning and depth-of-field awareness</li>
+            <li>Duplicate and export detection</li>
+            <li>People, search, storage dashboard</li>
+            <li>Review, approve, stage, undo</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="pill next">Coming next</span>
+          <ul>
+            <li>Ratings and rejects written to XMP, so Lightroom and Capture One pick them up</li>
+            <li>Closed-eye detection</li>
+            <li>A proper Mac app you install by dragging it to Applications</li>
+            <li>Testing on more cameras. So far it's mostly been Sony ARW.</li>
+            <li>Learning from your own keep and reject choices</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>Questions</h2>
+      <details><summary>Will it delete my photos?</summary><p>No. Declic doesn't have a delete button. It can move rejects you approved into a staging folder on the same drive, and undo puts every file back where it was. Emptying that folder is up to you.</p></details>
+      <details><summary>Does it replace Lightroom?</summary><p>No. It's for the part before editing: going from a full card to the frames worth opening in Lightroom or Capture One.</p></details>
+      <details><summary>What do I need?</summary><p>A Mac with Apple Silicon. I've been running it on an M1 Max with 32 GB of memory. The models take about 5.5 GB of disk.</p></details>
+      <details><summary>Windows?</summary><p>Not for now. The vision model runs on Apple's MLX, and I'd rather make one platform good first.</p></details>
+      <details><summary>Will it be free?</summary><p>It's free during the beta. I haven't decided what happens after. What I can promise is that it won't become a subscription you need to keep your own ratings, and your data will stay in files you own.</p></details>
+      <details><summary>Where's the code?</summary><p>Not public yet. I want it to install cleanly on someone else's Mac before I put it out there.</p></details>
+    </div>
+  </section>
+
+  <section id="join">
+    <div class="wrap">
+      <div class="cta">
+        <h2>Try it on your next shoot</h2>
+        <p>I'm looking for a small group of photographers who shoot a lot of bursts: sports, events, wildlife, kids. You'd get early builds, I'd get to see where it gets things wrong.</p>
+        <a class="btn primary" data-link="beta" href="#">Sign up for the beta</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Declic · made by a photographer, for the evening after the shoot.</span>
+    <span><a data-link="repo" href="#">GitHub</a> · <a href="privacy.html">Privacy</a></span>
+  </div>
+</footer>
+
+<script>
+  // On GitHub Pages (user.github.io/declic) the repo is known from the URL, so links need no editing.
+  (function () {
+    var host = location.hostname, parts = location.pathname.split("/").filter(Boolean);
+    var repo = host.endsWith(".github.io") && parts[0] ? host.split(".")[0] + "/" + parts[0] : null;
+    var base = repo ? "https://github.com/" + repo : null;
+    document.querySelectorAll("[data-link]").forEach(function (a) {
+      if (!base) return;
+      a.href = a.dataset.link === "beta" ? base + "/issues/new?template=beta-signup.yml" : base;
+    });
+  })();
+</script>
+</body>
+</html>

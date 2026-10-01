@@ -1,0 +1,63 @@
+name: Join the beta
+description: Get early builds of Declic and help me find where it gets things wrong.
+title: "Beta: "
+labels: ["beta"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for wanting to try it.
+
+        **This form is public.** Don't put your email, phone number or anything private here. I'll reply on this issue.
+  - type: input
+    id: camera
+    attributes:
+      label: Camera(s)
+      description: Body and the RAW format you shoot, if you know it.
+      placeholder: Sony a6600 (ARW), Fuji X-T5 (RAF)
+    validations:
+      required: true
+  - type: dropdown
+    id: mac
+    attributes:
+      label: Your Mac
+      options:
+        - Apple Silicon, 8 GB memory
+        - Apple Silicon, 16 GB memory
+        - Apple Silicon, 24 GB or more
+        - Intel Mac
+        - I don't have a Mac
+    validations:
+      required: true
+  - type: checkboxes
+    id: genres
+    attributes:
+      label: What do you shoot most?
+      options:
+        - label: Sports or motorsport
+        - label: Events or weddings
+        - label: Wildlife or birds
+        - label: Kids, family or pets
+        - label: Street or travel
+        - label: Something else
+  - type: dropdown
+    id: volume
+    attributes:
+      label: Photos per shoot, usually
+      options:
+        - Under 300
+        - 300 to 1,000
+        - 1,000 to 3,000
+        - More than 3,000
+    validations:
+      required: true
+  - type: input
+    id: tools
+    attributes:
+      label: What do you cull with today?
+      placeholder: Lightroom, Photo Mechanic, Aftershoot, by hand...
+  - type: textarea
+    id: pain
+    attributes:
+      label: What's the most annoying part of going through a shoot?
+      description: Optional, but this is the part I read twice.

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the roadmap first
+    url: https://github.com/75link/declic/blob/main/ROADMAP.md
+    about: What's planned, in order.
