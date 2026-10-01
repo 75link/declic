@@ -22,8 +22,6 @@ Declic goes through a whole memory card, groups the bursts, picks the sharpest f
 
 Copies from three imports ago. Ten versions of the same sunset. Bursts where only one frame is sharp. A drive that keeps filling up. Declic sorts through all of it on your Mac: it finds the copies and near-copies, picks the best shot of every moment, flags the blurry ones and tells you how much space you'd get back. You decide what goes.
 
-On one race weekend: 3,622 RAW files, 367 bursts, and 65 GB of the 91 GB turned out to be near-identical frames.
-
 > **The code isn't public yet.** I want it to install cleanly on someone else's Mac before I put it out there. This repo is the home for the project in the meantime: the website, the roadmap, and the beta sign-up.
 
 ## What it does
