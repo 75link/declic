@@ -20,7 +20,9 @@
 
 Declic goes through a whole memory card, groups the bursts, picks the sharpest frame and tells you why. It's pronounced *day-kleek*, French for the click of a shutter.
 
-Shooting a cycling race means holding the shutter down: at 11 frames a second, one rider going past is twenty frames, and only one of them has the wheel, the face and the light exactly right. After two days at a race I came home with 3,622 RAW files on one card. Finding that one frame in every burst is the slowest part of the job, so I built a tool that does the first pass on my own laptop and leaves the final call to me. On that card, 65 GB of the 91 GB turned out to be near-identical burst frames.
+Built for photographers who shoot fast: sports, events, wildlife. When the moment lasts a fraction of a second you shoot in bursts, and one weekend fills a card with thousands of frames that look almost the same. Declic does the first pass and shows you why it picked each frame. You make the final call.
+
+On one race weekend: 3,622 RAW files, 367 bursts, and 65 GB of the 91 GB turned out to be near-identical frames.
 
 > **The code isn't public yet.** I want it to install cleanly on someone else's Mac before I put it out there. This repo is the home for the project in the meantime: the website, the roadmap, and the beta sign-up.
 
