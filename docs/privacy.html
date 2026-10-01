@@ -11,8 +11,8 @@
   body { margin: 0; background: var(--page); line-height: 1.65; }
   main { max-width: 680px; margin: 0 auto; padding: 48px 24px 72px; }
   a { color: inherit; }
-  .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 750; font-size: 18px; text-decoration: none; margin-bottom: 40px; }
-  .brand img { width: 28px; height: 28px; }
+  .wordmark { display: inline-block; font-weight: 850; letter-spacing: -0.045em; text-decoration: none; color: var(--ink); font-size: 26px; line-height: 1; margin-bottom: 40px; }
+  .wordmark b { color: #b5801f; font-weight: 900; }
   h1 { font-size: 40px; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 12px; }
   h2 { font-size: 20px; margin: 36px 0 8px; }
   p, li { color: var(--ink-2); }
@@ -23,7 +23,7 @@
 </head>
 <body>
 <main>
-  <a class="brand" href="./"><img src="assets/logo.svg" alt="">declic</a>
+  <a class="wordmark" href="./" aria-label="Declic">declic<b>.</b></a>
   <h1>Privacy</h1>
   <p>Short version: your photos stay on your Mac.</p>
 
