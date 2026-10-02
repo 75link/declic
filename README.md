@@ -33,6 +33,8 @@ Copies from three imports ago. Ten versions of the same sunset. Bursts where onl
 - **Groups faces into people** you can name.
 - **Search by describing**: "crowd at the finish line", "bike close-up".
 - **Shows how much space you'd get back** before you touch anything.
+- **Works with your editor.** Star ratings and color labels are written to standard .xmp sidecars that Lightroom, Capture One and Bridge read. Existing sidecar metadata is kept.
+- **Sorts into folders by event**, named after what's in them, with RAW and JPEG kept apart. You see the plan first, and it copies, never moves.
 - **Never deletes.** Approved rejects move to a staging folder on the same drive, and one click puts them all back.
 
 ## Privacy
@@ -51,9 +53,9 @@ Everything runs on your Mac. No account, no cloud, no analytics. After the one-t
 
 Early. It works well on my photos, which isn't the same as working well on yours.
 
-**Works today:** burst grouping and ranking, subject focus with panning and depth-of-field awareness, duplicates, people, search, the storage dashboard, and review → approve → stage → undo. Tested mostly on Sony ARW. Canon, Nikon, Fuji and DNG go through the same macOS decoder but haven't been tested yet.
+**Works today:** burst grouping and ranking, subject focus with panning and depth-of-field awareness, duplicates, people, search, the storage dashboard, review → approve → stage → undo, XMP ratings and color labels for Lightroom and Capture One, and folders by event. Tested mostly on Sony ARW. Canon, Nikon, Fuji and DNG go through the same macOS decoder but haven't been tested yet.
 
-**Coming next:** ratings written to XMP for Lightroom and Capture One, closed-eye detection, a real Mac app instead of a terminal setup, and more cameras. See the [roadmap](ROADMAP.md).
+**Coming next:** closed-eye detection, a real Mac app instead of a terminal setup (in progress), and more cameras. See the [roadmap](ROADMAP.md).
 
 **Requirements:** a Mac with Apple Silicon. I run it on an M1 Max with 32 GB. The models take about 5.5 GB of disk.
 

@@ -131,6 +131,16 @@
   .card h3 { margin: 0 0 8px; font-size: 17px; letter-spacing: -0.01em; }
   .card p { margin: 0; color: var(--ink-2); font-size: 15px; }
 
+  .flow { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; }
+  .flow-points { display: grid; gap: 18px; }
+  .flow-points h3 { margin: 0 0 4px; font-size: 17px; letter-spacing: -0.01em; }
+  .flow-points p { margin: 0; color: var(--ink-2); font-size: 15px; }
+  .tree { margin: 0; background: #1c1a17; color: #efe8da; border-radius: 18px; padding: 22px 24px; box-shadow: 0 18px 40px rgba(40,30,10,.12); overflow-x: auto; }
+  .tree figcaption { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #a8a090; margin-bottom: 12px; }
+  .tree pre { margin: 0; font: 13.5px/1.75 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .tree pre span { color: #e2b04f; }
+  @media (prefers-color-scheme: dark) { .tree { background: #0d0c0b; border: 1px solid var(--line); } }
+
   .technique { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .technique .card { padding: 0; overflow: hidden; }
   .technique .card div { padding: 18px 20px 20px; }
@@ -167,7 +177,7 @@
   @media (max-width: 900px) {
     .frames { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .frames .frame:nth-child(n+4) { display: none; }
-    .story, .privacy, .status { grid-template-columns: 1fr; }
+    .story, .privacy, .status, .flow { grid-template-columns: 1fr; }
     .steps { grid-template-columns: 1fr; gap: 22px; }
     .grid, .technique { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
@@ -219,6 +229,7 @@
     <a class="wordmark" href="#" aria-label="Declic">declic<b>.</b></a>
     <nav>
       <a href="#how">How it works</a>
+      <a href="#workflow">Workflow</a>
       <a href="#technique">Technique</a>
       <a href="#privacy">Privacy</a>
       <a href="#status">Status</a>
@@ -316,6 +327,36 @@
     </div>
   </section>
 
+  <section id="workflow">
+    <div class="wrap flow">
+      <div>
+        <h2>Ready for your editor, sorted into folders</h2>
+        <p class="intro" style="margin-bottom:22px">When you're done picking, Declic hands the result over in the formats you already use.</p>
+        <div class="flow-points">
+          <div><h3>Lightroom, Capture One, Bridge</h3><p>Star ratings and color labels go into standard .xmp sidecar files next to your photos. Open the folder in your editor and they're already there. Anything an editor wrote into those files before is kept.</p></div>
+          <div><h3>Folders by event</h3><p>Declic splits your photos into events by date, starting a new one after a two-hour gap, and names each folder after what's in it. RAW and JPEG go into their own folders, and sidecars travel with their photo.</p></div>
+          <div><h3>Copies, never moves</h3><p>You see the full folder plan before anything happens. Then it copies into the destination you pick, after checking there's enough room. Your originals stay exactly where they were.</p></div>
+        </div>
+      </div>
+      <figure class="tree" aria-label="Example of folders created by Declic">
+        <figcaption>Photos 2026</figcaption>
+<pre>2026/
+├── 2026-07-14_1830_Beach_Sunset/
+│   ├── RAW/
+│   │   ├── DSC04211.ARW
+│   │   └── DSC04211.xmp   <span>★★★★ · green</span>
+│   └── JPEG/
+│       └── DSC04211.JPG
+├── 2026-07-15_0905_Family_Picnic/
+│   └── RAW/
+│       ├── DSC04388.ARW
+│       └── DSC04388.xmp   <span>★★★</span>
+└── 2026-07-15_2010_Fireworks/
+    └── RAW/  <span>41 photos</span></pre>
+      </figure>
+    </div>
+  </section>
+
   <section id="technique">
     <div class="wrap">
       <h2>It doesn't punish good technique</h2>
@@ -346,7 +387,7 @@
           <li>No account, no cloud, no upload.</li>
           <li>No analytics or tracking in the app. This page doesn't load any third-party scripts or fonts either.</li>
           <li>It never deletes anything. Rejects you approve get moved to a staging folder on the same drive, and one click puts them all back.</li>
-          <li>RAW files are read, never written to.</li>
+          <li>RAW files are never modified. Ratings go into separate .xmp sidecar files.</li>
         </ul>
       </div>
       <div class="table-wrap">
@@ -378,14 +419,15 @@
             <li>Duplicate and export detection</li>
             <li>People, search, storage dashboard</li>
             <li>Review, approve, stage, undo</li>
+            <li>Star ratings and color labels in .xmp sidecars for Lightroom, Capture One and Bridge</li>
+            <li>Folders by event, copied with a preview first</li>
           </ul>
         </div>
         <div class="card">
           <span class="pill next">Coming next</span>
           <ul>
-            <li>Ratings and rejects written to XMP, so Lightroom and Capture One pick them up</li>
             <li>Closed-eye detection</li>
-            <li>A proper Mac app you install by dragging it to Applications</li>
+            <li>A proper Mac app you install by dragging it to Applications (in progress)</li>
             <li>Testing on more cameras. So far it's mostly been Sony ARW.</li>
             <li>Learning from your own keep and reject choices</li>
           </ul>
@@ -398,7 +440,7 @@
     <div class="wrap">
       <h2>Questions</h2>
       <details><summary>Will it delete my photos?</summary><p>No. Declic doesn't have a delete button. It can move rejects you approved into a staging folder on the same drive, and undo puts every file back where it was. Emptying that folder is up to you.</p></details>
-      <details><summary>Does it replace Lightroom?</summary><p>No. It's for the part before editing: going from a full card to the frames worth opening in Lightroom or Capture One.</p></details>
+      <details><summary>Does it replace Lightroom?</summary><p>No. It's for the part before editing: going from a full card to the frames worth opening in Lightroom or Capture One. Your star ratings and color labels carry over through .xmp sidecars. Lightroom keeps its pick and reject flags inside its own catalog, so those don't transfer; ratings do.</p></details>
       <details><summary>What do I need?</summary><p>A Mac with Apple Silicon. I've been running it on an M1 Max with 32 GB of memory. The models take about 5.5 GB of disk.</p></details>
       <details><summary>Windows?</summary><p>Not for now. The vision model runs on Apple's MLX, and I'd rather make one platform good first.</p></details>
       <details><summary>Will it be free?</summary><p>It's free during the beta. I haven't decided what happens after. What I can promise is that it won't become a subscription you need to keep your own ratings, and your data will stay in files you own.</p></details>
